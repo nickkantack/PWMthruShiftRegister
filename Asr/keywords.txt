@@ -1,0 +1,11 @@
+Asr	KEYWORD1
+watchShift	KEYWORD2
+shift	KEYWORD2
+commit	KEYWORD2
+Vals	KEYWORD2
+LEDs	KEYWORD2
+resolution	KEYWORD2
+Count	KEYWORD2
+State	KEYWORD2
+timeToShift	KEYWORD2
+dwellTime	KEYWORD2

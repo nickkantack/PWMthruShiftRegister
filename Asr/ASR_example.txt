@@ -1,0 +1,79 @@
+#include <Asr.h>
+/*
+ * Asr - Analog Shift Register
+ * 
+ * This library generates PWM output on all shift register outputs for a register
+ * or chain of registers. By default, it's dwellTime is set to 500 microseconds, indicating that
+ * the register is populated as quickly as possible then held for 500 microseconds before the
+ * process repeats. Different LEDs will be turned on and off as needed to generate
+ * the appropriate duty over the ~(500 us * number_of_color_levels) period.
+ */
+
+// I found good results with 8 color levels and 500us dwell time, and this dwell time is the default. You
+// Can tweak these to optimize your array since the ideal values will differ depending on the number of
+// LED's you are trying to drive.
+ 
+const int number_of_LEDs = 3; // This can be set arbitrarily high, although eventually flicker becomes an issue
+const int number_of_color_levels = 8; // Increasing this increases brightness range, decreasing it reduces flicker
+const int dataPin = 2;
+const int clockPin = 3;
+const int latchPin = 4;
+const int outputEnable = 5;
+
+Asr asr(number_of_LEDs, number_of_color_levels, dataPin, clockPin, latchPin, outputEnable);
+
+void setup() {
+  
+  // Here is where you would adjust the dwell time of the Asr object if you didn't want to use the default 500us.
+  //asr.dwellTime = 250; // micros - Increasing this increases brightness, decreasing it reduces flicker
+  
+}
+
+void loop() {
+  
+  asr.watchShift();   // asr.watchShift() causes the register to output simulated PWM to meet the color values specified
+					  // we want to call asr.watchShift() as often as possible.
+  
+  doSpectrum(); // See code below
+  
+}
+
+// The following variables accompany the spectral pattern example below
+long timeToChange = 0;
+long changeInterval = 25; // ms
+int rDir = 1;
+int gDir = 0;
+int bDir = 0;
+
+void doSpectrum() {
+  
+  // The following code creates a spectral pattern on the first RGB led whose red is connected to the first output
+  // of the shift register chain, blue connected to the second output of the shift register chain, and green connected
+  // to the third output.
+  
+  if (millis() > timeToChange){
+
+    asr.Vals[0] += rDir;
+    asr.Vals[1] += bDir;
+    asr.Vals[2] += gDir;
+
+    if (asr.Vals[0] == number_of_color_levels && asr.gVals[2] == 0){
+      rDir = 0;
+      gDir = 1;
+      bDir = -1;
+    }
+    if (asr.gVals[2] == number_of_color_levels && asr.bVals[1] == 0){
+      rDir = -1;
+      gDir = 0;
+      bDir = 1;
+    }
+    if (asr.bVals[1] == number_of_color_levels && asr.rVals[0] == 0){
+      rDir = 1;
+      gDir = -1;
+      bDir = 0;
+    }
+    timeToChange = millis() + changeInterval;
+  }
+  
+}
+
