@@ -85,9 +85,7 @@ void Asr::shift(){
 void Asr::commit(int state){
 
 	digitalWrite(dataPin, state);
-	digitalWrite(clockPin, HIGH);
-	digitalWrite(latchPin, LOW);
-	digitalWrite(clockPin, LOW);
-	digitalWrite(latchPin, HIGH);
+	digitalWrite(clockPin, clockState);
+	clockState = !clockState;
 
 }

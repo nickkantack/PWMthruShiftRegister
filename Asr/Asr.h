@@ -32,6 +32,7 @@ class Asr{
 		int clockPin;
 		int dataPin;
 		int outputEnable;
+		bool clockState;
 };
 
 #endif
